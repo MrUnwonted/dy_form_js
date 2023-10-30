@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div>
+    <label>
+      <input type="radio" name="radioOption" id="showRadio"> Show Label and Input
+    </label>
+  </div>
+  <div id="labelAndInput" style="display: none;">
+    <label for="inputField">Label:</label>
+    <input type="text" id="inputField">
+  </div>
+
+  <script>
+    const showRadio = document.getElementById('showRadio');
+const labelAndInput = document.getElementById('labelAndInput');
+
+showRadio.addEventListener('click', function() {
+  if (showRadio.checked) {
+    labelAndInput.style.display = 'block';
+  } else {
+    labelAndInput.style.display = 'none';
+  }
+});
+
+  </script>
+</body>
+</html>

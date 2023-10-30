@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Drag and Drop Form Builder</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        /* Code for Snackabr/toast */
+        #snackbar {
+        visibility: hidden;
+        min-width: 200px;
+        margin-left: -125px;
+        /* background: linear-gradient(#D8B5FF, #1EAE98); */
+        background: rgb(0, 0, 0);
+        color: #ffffff;
+        font-weight: bold;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        bottom: 30px;
+        font-size: 14px;
+        }
+        #snackbar.show {
+        visibility: visible;
+        -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @-webkit-keyframes fadein {
+        from {bottom: 0; opacity: 0;} 
+        to {bottom: 30px; opacity: 1;}
+        }
+
+        @keyframes fadein {
+        from {bottom: 0; opacity: 0;}
+        to {bottom: 30px; opacity: 1;}
+        }
+
+        @-webkit-keyframes fadeout {
+        from {bottom: 30px; opacity: 1;} 
+        to {bottom: 0; opacity: 0;}
+        }
+
+        @keyframes fadeout {
+        from {bottom: 30px; opacity: 1;}
+        to {bottom: 0; opacity: 0;}
+        }
+         body {
+            font-family: Arial, sans-serif;
+        }
+        .form-builder {
+            display: inline-block;
+            width: 300px;
+            border: 2px solid #ccc;
+            padding: 10px;
+        }
+        /* .canvas {
+            min-height: 300px;
+            height: 100%;
+            width: calc(100% - 600px);
+            border: 2px dashed #999;
+            padding: 10px;
+			background-color: rgb(255, 255, 255);
+        } */
+        .form-element {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 5px;
+            font-weight: bold;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .form-element:hover {
+            background-color: #cbccdf;
+            border: 1px solid #cccccc;
+            padding: 5px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .properties{
+        	width: 300px;
+        	height: 100%;
+        	padding: 10px;
+        }
+        table{
+        	border: 1px solid #e5e5e5;
+        	min-height: 20px;
+        	height: max-content;
+        }
+        table tr{
+        	border: 1px solid grey;
+        	min-height: 20px;
+        }
+        table tr td{
+        	border: 1px solid #e5e5e5;
+        	height: 30px;
+        }
+        .flex-box{
+        	display: flex;
+        	border: 1px solid #e5e5e5;
+        	padding: 10px;
+        	justify-content: space-evenly;
+        }
+        div{
+            border: 1px solid #e5e5e5;
+        }
+        .hidden{
+            
+        }
+    </style>
+</head>
+<body>
+    <h1>Drag and Drop Form Builder</h1>
+    <div style="width: 100%;display: flex;height: 100vh;">
+	    <div class="form-builder">
+	        <h2>Form Elements</h2>
+            <div class="dropdown">
+                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu2"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Layout
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                    <div class="form-element"draggable="true" ondragstart="drag(event)" data-element-type="grid">Grid</div>
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="flexbox">Flexbox</div>
+                </div>
+              </div>
+            <div class="dropdown">
+                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu2"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Select
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="checkbox">Checkbox</div>
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="radio">Radio</div>
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="select">Select</div>
+                </div>
+              </div>
+            <div class="dropdown">
+                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu2"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Input
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="text">Text Input</div>
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="label">Label</div>
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="textarea">Textarea</div>
+                </div>
+              </div>
+            <div class="dropdown">
+                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu2"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Other
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="date">Date</div>
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="number">Number</div>
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="time">Time</div>
+                </div>
+              </div>    
+            <div class="dropdown">
+                <button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenu2"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Header
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="h1">H1</div>
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="h2">H2</div>
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="h3">H3</div>
+                    <div class="form-element" draggable="true" ondragstart="drag(event)" data-element-type="h4">H4</div>
+                </div>
+              </div>    
+	    </div>
+        
+
+        
+      
+
+	    <div class="canvas" 
+        style="
+            min-height: 300px;
+            height: 100%;
+            width: calc(100% - 600px);
+            border: 2px dashed #999;
+            padding: 10px;
+			background-color: rgb(255, 255, 255);"
+        id="canvas" ondrop="drop(event)" ondragover="allowDrop(event)">
+	    	
+	    </div>
+
+        
+        <!-- Snackbar div -->
+        <div id="snackbar">Some text some message..</div>
+	 
+        <div class="properties" id="prop">
+            <div id="prop-grid" class="hidden">
+                <label>Columns</label>
+                <input id="columns" type="number"><br></br>
+                <label>Rows</label>
+                <input id="rows" type="number"><br></br>
+            </div>
+            <div id="prop-radio" class="hidden">
+                <label for="radios">Number</label>
+                <input id="radios" type="number"> <br> <br>
+                <label for="radioName">Group Name</label>
+                <input id="radioName" type="text" onchange="updateRadioGroupName()"> <br> <br>
+            </div>
+            <div id="prop-select" class="hidden">
+                <label>Select Item</label>
+                <input id="selectItem" type="text"> <br> <br>
+                <button onclick="addSelectItem(document.getElementById('selectItem'))">Add</button>
+            </div>
+            <div id="prop-flex" class="hidden">
+                <label>H Align</label>
+                <select id="flex">
+                    <option value="Right" label="Right"/>
+                    <option value="Left" label="Left"/>
+                    <option value="Center" label="Center" selected/>
+                </select>
+            </div>
+            <button type="button" onclick="saveProperties()">Save Properties</button>
+          </div>
+          
+	</div>
+
+    <script>
+    	
+    	var selectedElement=null;
+		document.addEventListener('keydown', e => {
+		  if (e.keyCode === 46) {//Delete
+		    e.preventDefault();
+		    //  selectedElement.parentNode.removeChild(selectedElement);
+				if (selectedElement && selectedElement.parentNode) { //If true then ..
+					selectedElement.parentNode.removeChild(selectedElement);
+				}
+
+		  }
+		});
+        hideAllProps();
+        function hideAllProps(){
+            const ellist=document.querySelectorAll(".hidden");
+            for(const el of ellist){
+                el.style.display="none";
+            }
+        }
+        function openProps(elType){
+            hideAllProps();
+            if(elType==="grid"){
+                document.getElementById('prop-grid').style.display="";
+            }else if(elType==="select"){
+                document.getElementById('prop-select').style.display="";
+            }else if(elType==="radio"){
+                document.getElementById('prop-radio').style.display="";
+            }else if(elType==="flexbox"){
+                document.getElementById('prop-flex').style.display="";
+            }
+        }
+
+        function addSelectItem(el){
+            const selectItem=document.createElement('option');
+            selectItem.value=el.value;
+            selectItem.label=el.value;
+            selectedElement.appendChild(selectItem);
+        }
+    
+        function saveProperties() {
+            if (selectedElement != null) {
+                if (selectedElement.tagName == "TABLE") {
+                var cols = document.getElementById("columns").value;
+                var rows = document.getElementById("rows").value;
+
+                for (var i = selectedElement.rows.length - 1; i > 0; i--) {
+                    selectedElement.deleteRow(i);
+                }
+
+                for (var i = 0; i < rows; i++) {
+                    var row = document.createElement("tr");
+                    for (var j = 0; j < cols; j++) {
+                    var cell = document.createElement("td");
+                    cell.addEventListener("dragover", function(event) {
+                        allowDrop(event);
+                    });
+                    row.appendChild(cell);
+                    }
+                    selectedElement.appendChild(row);
+                }
+                } else if (selectedElement.tagName == "DIV" && selectedElement.name == "radio") {
+                    selectedElement.innerHTML = "";
+
+                    var radios = document.getElementById("radios").value;
+                    var radioName = document.getElementById("radioName").value;
+
+                    for (var i = 0; i < parseInt(radios); i++) {
+                        const radioElement = document.createElement("input");
+                        radioElement.type = "radio";
+                        radioElement.name = radioName;
+                        radioElement.style.marginRight="20px";
+                        radioElement.id = (i + 1) + radioName;
+                        const labelElement = document.createElement("label");
+                        labelElement.textContent = "Radio";
+                        labelElement.htmlFor = (i + 1) + radioName;
+                        labelElement.addEventListener("click", function(event) {
+                        selectedElement = event.target;
+                        });
+                        radioElement.addEventListener("click", function(event) {
+                        selectedElement = event.target;
+                        });
+                        selectedElement.appendChild(labelElement);
+                        selectedElement.appendChild(radioElement);
+                    }
+                } else if (selectedElement.classList.contains("flex-box")) {
+                    if(document.getElementById("flex").value=="Right"){
+                        selectedElement.style.justifyContent="flex-end";
+                    }
+                    if(document.getElementById("flex").value=="Left"){
+                        selectedElement.style.justifyContent="flex-start";
+                    }
+                    if(document.getElementById("flex").value=="Center"){
+                        selectedElement.style.justifyContent="center";
+                    }
+                }
+                console.log(selectedElement.classList.contains("flex-box"));
+        }
+        }
+
+            function updateRadioGroupName() {
+                // debugger;
+                const radioGroupName = document.getElementById("radioName").value;
+                const radioButtons = selectedElement.querySelectorAll("input[type='radio']");
+                for (const radioButton of radioButtons) {
+                    radioButton.name = radioGroupName;
+                }
+
+            }
+
+            function allowDrop(event) {
+                event.preventDefault();
+            }
+
+            function drag(event) {
+                event.dataTransfer.setData("text", event.target.getAttribute('data-element-type'));
+            }
+
+        function drop(event) {
+            event.preventDefault();
+            const elementType = event.dataTransfer.getData("text");
+            if (elementType === 'grid') {
+            	const container = document.createElement('div');
+                var grid = document.createElement("table");
+        		grid.style.width="100%";
+                grid.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+                	document.getElementById('columns').value = selectedElement.rows.length;
+                	if(selectedElement.rows[0]!=null){
+        				document.getElementById('rows').value = selectedElement.rows[0].cells.length;
+        			}else{
+        				document.getElementById('rows').value = 0;
+        			}
+		        });
+                container.appendChild(grid);
+                event.target.appendChild(container);
+            }else if (elementType === 'text') {
+            	const container = document.createElement('div');
+                const inputElement = document.createElement('input');
+                inputElement.type = 'text';
+                inputElement.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                inputElement.placeholder = 'Text Input';
+                container.appendChild(inputElement);
+                event.target.appendChild(container);
+            }else if (elementType === 'h1') {
+            	const container = document.createElement('h1');
+                const inputElement = document.createElement('input');
+                inputElement.type = 'h1';
+                inputElement.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                inputElement.placeholder = 'Enter here';
+                container.appendChild(inputElement);
+                event.target.appendChild(container);
+            }else if (elementType === 'h2') {
+            	const container = document.createElement('h2');
+                const inputElement = document.createElement('input');
+                inputElement.type = 'h2';
+                inputElement.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                inputElement.placeholder = 'Enter here';
+                container.appendChild(inputElement);
+                event.target.appendChild(container);
+            }else if (elementType === 'h3') {
+            	const container = document.createElement('h3');
+                const inputElement = document.createElement('input');
+                inputElement.type = 'h3';
+                inputElement.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                inputElement.placeholder = 'Enter here';
+                container.appendChild(inputElement);
+                event.target.appendChild(container);
+            }else if (elementType === 'h4') {
+            	const container = document.createElement('h4');
+                const inputElement = document.createElement('input');
+                inputElement.type = 'h4';
+                inputElement.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                inputElement.placeholder = 'Enter here';
+                container.appendChild(inputElement);
+                event.target.appendChild(container);
+            } else if (elementType === 'date') {
+            	const container = document.createElement('div');
+                const inputElement = document.createElement('input');
+                inputElement.type = 'date';
+                inputElement.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                inputElement.placeholder = 'Date';
+                container.appendChild(inputElement);
+                event.target.appendChild(container);
+            }else if (elementType === 'flexbox') {
+            	const container = document.createElement('div');
+				container.classList.add("flex-box");
+                container.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                event.target.appendChild(container);
+            }else if (elementType === 'label') {
+            	const element = document.createElement('label');
+            	element.innerText="Label";
+				element.contentEditable = true;
+                element.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                event.target.appendChild(element);
+            } else if (elementType === 'textarea') {
+            	const container = document.createElement('div');
+                const textareaElement = document.createElement('textarea');
+                textareaElement.placeholder = 'Textarea';
+                textareaElement.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                container.style.padding="10px";
+                container.appendChild(textareaElement);
+                event.target.appendChild(container);
+            } else if (elementType === 'checkbox') {
+            	const container = document.createElement('div');
+                const checkboxElement = document.createElement('input');
+                checkboxElement.type = 'checkbox';
+                const labelElement = document.createElement('label');
+                labelElement.textContent = 'Checkbox';
+                labelElement.contentEditable = true;
+                labelElement.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+		        checkboxElement.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                container.appendChild(labelElement);
+                container.appendChild(checkboxElement);
+                event.target.appendChild(container);
+            }	else if (elementType === 'radio') {
+				const container = document.createElement('div');
+				const radioElement = document.createElement('input');
+                container.style.padding="10px";
+                container.name="radio";
+				radioElement.type = 'radio';
+                radioElement.style.marginRight="20px";
+                //radioElement.name ="radioGroup";
+				const labelElement = document.createElement('label');
+				labelElement.textContent = 'Radio';
+                labelElement.contentEditable= 'true';
+                labelElement.htmlFor ='0radio';
+				container.addEventListener("click", function(event) {
+					selectedElement = event.target;
+                    openProps(elementType);
+				});
+                labelElement.addEventListener("click", function(event) {
+                    selectedElement = event.target;
+                    openProps(elementType);
+                });
+				radioElement.addEventListener("click", function(event) {
+					selectedElement = event.target;
+                    openProps(elementType);
+				});
+				container.appendChild(labelElement);
+				container.appendChild(radioElement);
+				event.target.appendChild(container);
+			} else if (elementType === 'number') {
+            	const container = document.createElement('div');
+                const numberElement = document.createElement('input');
+                numberElement.type = 'number';
+                numberElement.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                container.appendChild(numberElement);
+                event.target.appendChild(container);
+            } else if (elementType === 'select') {
+            	const container = document.createElement('div');
+                const selectElement = document.createElement('select');
+                selectElement.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                container.appendChild(selectElement);
+                event.target.appendChild(container);
+            } else if (elementType === 'time') {
+            	const container = document.createElement('div');
+                const timeElement = document.createElement('input');
+                timeElement.type = 'time';
+                timeElement.addEventListener("click", function(event) {
+                	selectedElement=event.target;
+                    openProps(elementType);
+		        });
+                container.appendChild(timeElement);
+                event.target.appendChild(container);
+            }
+            // Code for snackbar
+            if (event.target.id === 'canvas') {
+                // Show the Snackbar if an element was dropped inside the canvas
+                showSnackbar(elementType);
+            }
+
+        }
+
+        //  Function for showing snackabr
+        function showSnackbar(elementType) {   
+            var x = document.getElementById("snackbar");
+            x.className = "show";
+            x.innerText = elementType + "  added";
+            setTimeout(function () {
+                x.className = x.className.replace("show", "");
+               }, 3000);
+        }
+
+    </script>
+</body>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</html>
